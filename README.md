@@ -13,6 +13,7 @@ CS:GO Python External cheat with Qt menu (work in progress)
 **To do**:
 - Add skinchanger
 - Add RCS amount slider functionality
+- Patter scanning for Offsets to rely less on [hazedumper](https://github.com/frk1/hazedumper) updates
 
 **TempleOS Menu**:
 
