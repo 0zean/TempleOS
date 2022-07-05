@@ -168,7 +168,7 @@ class Ui_TempleOS(object):
         self.client = pymem.process.module_from_name(self.pm.process_handle, "client.dll").lpBaseOfDll
         self.engine = pymem.process.module_from_name(self.pm.process_handle, "engine.dll").lpBaseOfDll
         self.rcsc = False
-        self.aimrcs = False
+        self.aimrcs = True
         self.aimfov = False
         self.aimkey = str()
     def update(self):
@@ -761,9 +761,9 @@ class Ui_TempleOS(object):
         self.label_3.setText("")
     # retranslateUi
     def main(self):
-        pm = pymem.Pymem("csgo.exe")
-        client = pymem.process.module_from_name(pm.process_handle, "client.dll").lpBaseOfDll
-        engine = pymem.process.module_from_name(pm.process_handle, "engine.dll").lpBaseOfDll
+        pm = self.pm
+        client = self.client
+        engine = self.engine
         player = pm.read_uint(client + dwLocalPlayer)
         engine_pointer = pm.read_uint(engine + dwClientState)
         while True:
@@ -776,8 +776,8 @@ class Ui_TempleOS(object):
             olddisty = 111111111111
             if client and engine and pm:
                 try:
-                    player = pm.read_uint(client + dwLocalPlayer)
-                    engine_pointer = pm.read_uint(engine + dwClientState)
+                    #player = pm.read_uint(client + dwLocalPlayer)
+                    #engine_pointer = pm.read_uint(engine + dwClientState)
                     glow_manager = pm.read_uint(client + dwGlowObjectManager)
                     crosshairID = pm.read_uint(player + m_iCrosshairId)
                     getcrosshairTarget = pm.read_uint(client + dwEntityList + (crosshairID - 1) * 0x10)
@@ -851,25 +851,25 @@ class Ui_TempleOS(object):
                                 OldUser = Commands + ((Desired - 1) % 150) * 100
                                 VerifedOldUser = VerifedCommands + ((Desired - 1) % 150) * 0x68
                                 m_buttons = pm.read_uint(OldUser + 0x30)
-                                Net_Channel = pm.read_uint( engine_pointer + clientstate_net_channel)
+                                Net_Channel = pm.read_uint(engine_pointer + clientstate_net_channel)
                                 if pm.read_uint(Net_Channel + 0x18) < Desired:
                                     pass
                                 elif self.aimrcs:
                                     pm.write_float(OldUser + 0x0C, normalize_x)
                                     pm.write_float(OldUser + 0x10, normalize_y)
-                                    pm.write_uint(OldUser + 0x30, m_buttons | (1 << 0))
+                                    pm.write_int(OldUser + 0x30, m_buttons | (1 << 0))
                                     pm.write_float(VerifedOldUser + 0x0C, normalize_x - (punchx * 2))
                                     pm.write_float(VerifedOldUser + 0x10, normalize_y - (punchy * 2))
-                                    pm.write_uint(VerifedOldUser + 0x30, m_buttons | (1 << 0))
+                                    pm.write_int(VerifedOldUser + 0x30, m_buttons | (1 << 0))
                                     pm.write_uchar(engine + dwbSendPackets, 1)
                                 else:
                                     pm.write_float(OldUser + 0x0C, normalize_x)
                                     pm.write_float(OldUser + 0x10, normalize_y)
-                                    pm.write_uint(OldUser + 0x30, m_buttons | (1 << 0))
+                                    pm.write_int(OldUser + 0x30, m_buttons | (1 << 0))
                                     pm.write_float(VerifedOldUser + 0x0C, normalize_x)
                                     pm.write_float(VerifedOldUser + 0x10, normalize_y)
-                                    pm.write_uint(VerifedOldUser + 0x30, m_buttons | (1 << 0))
-                                    pm.write_uchar(engine + dwbSendPackets, 1 )
+                                    pm.write_int(VerifedOldUser + 0x30, m_buttons | (1 << 0))
+                                    pm.write_uchar(engine + dwbSendPackets, 1)
                             elif self.aimrcs and pm.read_uint(player + m_iShotsFired) > 1:
                                 pm.write_float(engine_pointer + dwClientState_ViewAngles, normalize_x - (punchx * 2))
                                 pm.write_float(engine_pointer + dwClientState_ViewAngles + 0x4, normalize_y - (punchy * 2))
@@ -892,28 +892,23 @@ class Ui_TempleOS(object):
                 if flash_value:
                     self.pm.write_float(flash_value, float(0))
             if self.rcsc:
-                oldpunchx = 0.0
-                oldpunchy = 0.0
-                while self.rcsc:
-                    time.sleep(0.01)
-                    if self.pm.read_uint(player + m_iShotsFired) > 1:
-                        rcs_x = self.pm.read_float(engine_pointer + dwClientState_ViewAngles)
-                        rcs_y = self.pm.read_float(engine_pointer + dwClientState_ViewAngles + 0x4)
-                        punchx = self.pm.read_float(player + m_aimPunchAngle)
-                        punchy = self.pm.read_float(player + m_aimPunchAngle + 0x4)
-                        newrcsx = rcs_x - (punchx - oldpunchx) * 2.0
-                        newrcsy = rcs_y - (punchy - oldpunchy) * 2.0
-                        newrcs, newrcy = normalizeAngles(newrcsx, newrcsy)
-                        oldpunchx = punchx
-                        oldpunchy = punchy
-                        if nanchecker(newrcsx, newrcsy) and checkangles(newrcsx, newrcsy):
-                            self.pm.write_float(engine_pointer + dwClientState_ViewAngles, newrcsx)
-                            self.pm.write_float(engine_pointer + dwClientState_ViewAngles + 0x4, newrcsy)
-                    else:
-                        oldpunchx = 0.0
-                        oldpunchy = 0.0
-                        newrcsx = 0.0
-                        newrcsy = 0.0
+                #oldpunchx = 0.0
+                #oldpunchy = 0.0
+                if pm.read_uint(player + m_iShotsFired) > 1:
+                    rcs_x = pm.read_float(engine_pointer + dwClientState_ViewAngles)
+                    rcs_y = pm.read_float(engine_pointer + dwClientState_ViewAngles + 0x4)
+                    punchx = pm.read_float(player + m_aimPunchAngle)
+                    punchy = pm.read_float(player + m_aimPunchAngle + 0x4)
+                    newrcsx = rcs_x - (punchx - oldpunchx) * float(2)
+                    newrcsy = rcs_y - (punchy - oldpunchy) * float(2)
+                    newrcs, newrcy = normalizeAngles(newrcsx, newrcsy)
+                    oldpunchx = punchx
+                    oldpunchy = punchy
+                    if nanchecker(newrcsx, newrcsy) and checkangles(newrcsx, newrcsy):
+                        pm.write_float(engine_pointer + dwClientState_ViewAngles, newrcsx)
+                        pm.write_float(engine_pointer + dwClientState_ViewAngles + 0x4, newrcsy)
+                else:
+                    oldpunchx = oldpunchy = 0.0
             if self.bhopc:
                 if is_press("space"):
                     force_jump = client + dwForceJump
