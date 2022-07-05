@@ -4,7 +4,8 @@ import threading
 import time
 from math import *
 
-import keyboard, mouse
+import keyboard
+import mouse
 import pymem
 import pymem.process
 import requests
