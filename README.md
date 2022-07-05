@@ -12,7 +12,7 @@ CS:GO Python External cheat with Qt menu (work in progress)
 
 **To do**:
 - Add skinchanger
-- Add RCS amount slider functionality
+- Add RCS-amount slider functionality
 - Patter scanning for Offsets to rely less on [hazedumper](https://github.com/frk1/hazedumper) updates
 
 **TempleOS Menu**:
@@ -20,7 +20,7 @@ CS:GO Python External cheat with Qt menu (work in progress)
 ![alt text](https://github.com/0zean/TempleOS/blob/main/menu_sample.png)
 
 **How to use**:
-Open up the command prompt from within the folder the files are saved to and enter "python TempleOS.py". To enable a feature, select it and press the update button. To disable a fearure, deselect it and press update again. The triggerbot and aimbot require the "trigger key" & "aim key/fov" fields be filled, for instance Trigger Key: alt, Aim Key: x, Aim FOV: 30. There is no guarantee that this is VAC safe.
+Make sure to install the font first. Open up the command prompt from within the folder the files are saved to and enter "python TempleOS.py". To enable a feature, select it and press the update button. To disable a fearure, deselect it and press update again. The triggerbot and aimbot require the "trigger key" & "aim key/fov" fields be filled, for instance Trigger Key: alt, Aim Key: x, Aim FOV: 30. There is no guarantee that this is VAC safe.
 
 **Requirements**:
 - Pymem
